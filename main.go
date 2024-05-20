@@ -37,7 +37,7 @@ func child() {
 	syscall.Sethostname([]byte("AshishNemo"))
 	fmt.Printf("Root Change...\n")
 	must(syscall.Chroot("")) // add your Own Iamge Directory
-	fmt.Printf("Directo Change...\n")
+	fmt.Printf("Directory Change...\n")
 	syscall.Chdir("/home")
 
 	cmd := exec.Command(os.Args[2], os.Args[3:]...)
