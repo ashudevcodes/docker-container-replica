@@ -20,3 +20,13 @@ This Go code helps create a container similar to Docker using the `os` module an
 ```bash
     sudo go run main.go run /bin/bash
 ```
+
+
+## Potential Issues that were fixed
+
+- **Argument Checking**: The program assumes that os.Args[1] always exists, which can cause a panic if no arguments are provided.
+  ```if len(os.Args) < 2 {
+    fmt.Printf("Usage: %s [run|child] [command]\n", os.Args[0])
+    os.Exit(1)
+}
+```
