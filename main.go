@@ -8,6 +8,10 @@ import (
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Printf("Usage: %s [run|child] [command]\n", os.Args[0])
+		os.Exit(1)
+	}
 	switch os.Args[1] {
 	case "run":
 		run()
@@ -27,28 +31,44 @@ func run() {
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
 	}
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error running command: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 func child() {
 	fmt.Printf("Running %v as %d\n", os.Args[2:], os.Getpid())
 
 	fmt.Printf("Host Name Change...\n")
-	syscall.Sethostname([]byte("AshishNemo"))
+	if err := syscall.Sethostname([]byte("AshishNemo")); err != nil {
+		fmt.Printf("Error setting hostname: %v\n", err)
+		os.Exit(1)
+	}
 	fmt.Printf("Root Change...\n")
-	must(syscall.Chroot("")) // add your Own Iamge Directory
+	if err := syscall.Chroot("/path/to/new/root"); err != nil { // Change this to a valid path
+		fmt.Printf("Error changing root: %v\n", err)
+		os.Exit(1)
+	}
 	fmt.Printf("Directory Change...\n")
-	syscall.Chdir("/home")
+	if err := syscall.Chdir("/home"); err != nil {
+		fmt.Printf("Error changing directory: %v\n", err)
+		os.Exit(1)
+	}
 
 	cmd := exec.Command(os.Args[2], os.Args[3:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Error running command: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 func must(err error) {
 	if err != nil {
 		fmt.Println("Error :) ", err)
+		os.Exit(1)
 	}
 }
